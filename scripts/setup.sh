@@ -1,6 +1,7 @@
-scp -o PubkeyAuthentication=no -o PreferredAuthentications=password robot_bridge.py pi@192.168.1.11:/home/pi/
+IP=192.168.1.99
+scp -o PubkeyAuthentication=no -o PreferredAuthentications=password robot_bridge_socket.py pi@"$IP":/home/pi/
 
-ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password pi@192.168.1.11
+ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password pi@"$IP"
 
 
 ps aux | grep python

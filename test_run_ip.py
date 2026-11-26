@@ -4,7 +4,7 @@ import cv2
 from robot_client_socket import RemoteRaspbot
 
 # Use IP from command line if provided, otherwise default to 192.168.1.99
-if (len(sys.argv) < 3 ):
+if (len(sys.argv) < 2 ):
     raise Exception("Requires IP addr argument of robot");
 
 robot_ip = sys.argv[1];
