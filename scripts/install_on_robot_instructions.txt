@@ -1,0 +1,8 @@
+IP=$1
+
+scp -o PubkeyAuthentication=no -o PreferredAuthentications=password robot_bridge_socket.py pi@"$IP":/home/pi/
+scp -o PubkeyAuthentication=no -o PreferredAuthentications=password scripts/create_autostarter.sh pi@"$IP":/home/pi/
+ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password pi@"$IP"
+
+#RUn command
+# bash create_autostarter.sh

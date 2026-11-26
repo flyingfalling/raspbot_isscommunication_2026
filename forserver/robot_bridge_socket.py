@@ -14,16 +14,24 @@ CMD_PORT = 5005
 bot = Raspbot()
 client_addr = None
 last_seen = 0.0
+
 pan_angle = 90
 tilt_angle = 30
-bot.Ctrl_Servo(1, 90)
-bot.Ctrl_Servo(2, 30)
-#pan_angle = 90
-#tilt_angle = 90
-#bot.Ctrl_Servo(1, 90)
-#bot.Ctrl_Servo(2, 90)
 
-# Single socket handles BOTH receiving commands and replying with video/state
+def reset_hardware():
+    """Safe-stop all motors, buzzer, and LEDs, and center head."""
+    global pan_angle, tilt_angle
+    for m_id in range(4):
+        bot.Ctrl_Muto(m_id, 0, 0)
+    bot.Ctrl_BEEP_Switch(0)
+    bot.Ctrl_WQ2812_ALL(0, 0)
+    pan_angle = 90
+    tilt_angle = 30
+    bot.Ctrl_Servo(1, pan_angle)
+    bot.Ctrl_Servo(2, tilt_angle)
+
+reset_hardware()
+
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(("0.0.0.0", CMD_PORT))
 
@@ -31,17 +39,26 @@ def command_listener():
     global client_addr, last_seen, pan_angle, tilt_angle
     while True:
         data, addr = sock.recvfrom(4096)
-        if client_addr != addr:
-            print(f"Connected to laptop at {addr}")
-        client_addr = addr
-        last_seen = time.time()
         try:
             msg = json.loads(data.decode("utf-8"))
             cmd = msg.get("cmd")
 
+            if cmd == "disconnect":
+                if client_addr == addr:
+                    print(f"Laptop at {addr} disconnected cleanly.")
+                    client_addr = None
+                    last_seen = 0.0
+                    reset_hardware()
+                continue
+
+            if client_addr != addr:
+                print(f"Connected to laptop at {addr}")
+            client_addr = addr
+            last_seen = time.time()
+
             if cmd == "head":
                 pan_angle = int(max(0, min(180, msg.get("pan", 90))))
-                tilt_angle = int(max(0, min(180, msg.get("tilt", 90))))
+                tilt_angle = int(max(0, min(110, msg.get("tilt", 30))))
                 bot.Ctrl_Servo(1, pan_angle)
                 bot.Ctrl_Servo(2, tilt_angle)
 
@@ -83,23 +100,26 @@ def video_and_state_loop():
     global client_addr
     cap = open_camera()
     while True:
-        # Automatically pause streaming 2 seconds after laptop stops sending
         if client_addr and (time.time() - last_seen > 2.0):
-            print("Laptop disconnected (timeout). Waiting...")
+            print("Laptop timed out. Stopping hardware and waiting...")
             client_addr = None
+            reset_hardware()
 
         if cap and client_addr:
             ret, frame = cap.read()
             if ret:
-                # Resize explicitly in OpenCV so UDP packet stays ~8-12 KB
                 small = cv2.resize(frame, (320, 240))
                 _, jpeg = cv2.imencode(".jpg", small, (int(cv2.IMWRITE_JPEG_QUALITY), 50))
-                # Prefix 'V' for Video packet
-                sock.sendto(b"V" + jpeg.tobytes(), client_addr)
+                try:
+                    sock.sendto(b"V" + jpeg.tobytes(), client_addr)
+                except Exception:
+                    pass
 
-            # Prefix 'S' for State packet
             state = json.dumps({"pan": pan_angle, "tilt": tilt_angle}).encode("utf-8")
-            sock.sendto(b"S" + state, client_addr)
+            try:
+                sock.sendto(b"S" + state, client_addr)
+            except Exception:
+                pass
 
         time.sleep(0.04)
 
