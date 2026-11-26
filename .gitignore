@@ -1,0 +1,22 @@
+# Virtual environments
+raspi_venv/
+venv/
+.venv/
+
+# Python bytecode & packaging artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+
+# Local credentials & notes
+login_info.txt
+.env
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

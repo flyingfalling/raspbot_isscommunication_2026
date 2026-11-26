@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "raspbot-client"
+version = "0.1.0"
+description = "UDP client wrapper for Yahboom Raspbot V2"
+dependencies = ["numpy", "opencv-python"]
+
+[tool.setuptools]
+py-modules = ["robot_client_socket"]
