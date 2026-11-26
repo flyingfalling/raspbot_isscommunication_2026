@@ -1,0 +1,10 @@
+user: pi
+pswd: yahboom
+
+Robot #1
+IP=192.168.1.99
+ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password pi@"$IP"
+
+Robot #2
+IP=192.168.1.100
+ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password pi@"$IP"
