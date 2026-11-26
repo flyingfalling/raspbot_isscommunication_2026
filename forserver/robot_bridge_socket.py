@@ -22,7 +22,7 @@ def reset_hardware():
     """Safe-stop all motors, buzzer, and LEDs, and center head."""
     global pan_angle, tilt_angle
     for m_id in range(4):
-        bot.Ctrl_Muto(m_id, 0, 0)
+        bot.Ctrl_Muto(m_id, 0)
     bot.Ctrl_BEEP_Switch(0)
     bot.Ctrl_WQ2812_ALL(0, 0)
     pan_angle = 90
@@ -73,8 +73,7 @@ def command_listener():
                 speeds = msg.get("speeds", (0, 0, 0, 0))
                 for m_id, spd in enumerate(tuple(speeds)[:4]):
                     spd = int(max(-255, min(255, spd)))
-                    direction = 0 if spd >= 0 else 1
-                    bot.Ctrl_Muto(m_id, direction, abs(spd))
+                    bot.Ctrl_Muto(m_id, spd)
 
             elif cmd == "beep":
                 state = 1 if msg.get("on", False) else 0
@@ -126,3 +125,4 @@ def video_and_state_loop():
 threading.Thread(target=command_listener, daemon=True).start()
 print("Raspbot single-socket bridge running...")
 video_and_state_loop()
+
