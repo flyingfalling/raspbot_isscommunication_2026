@@ -16,8 +16,8 @@ source raspi_venv/bin/activate
 # Windows (PowerShell):
 .\raspi_venv\Scripts\Activate.ps1
 
-# Install required packages
-pip install numpy opencv-python
+# Install required packages (including our own)
+pip install .
 ```
 
 ## 2. Connect to Your Robot
@@ -31,16 +31,16 @@ pip install numpy opencv-python
    *(Press `q` in the video window or `Ctrl+C` in the terminal to stop safely.)*
 
 ## 3. Running the Example Scripts (`examples/`)
-Run any example from the repository root using `PYTHONPATH=.` so Python finds `robot_client_socket.py`:
+Run any example:
 
 * **Full API Tour (Head, LEDs, Beeps, Wheels):**
-  `PYTHONPATH=. python examples/example_1_full_api_tour.py 192.168.1.99`
+  `python examples/example_1_full_api_tour.py 192.168.1.99`
 * **Acoustic & Visual Call Sender:**
-  `PYTHONPATH=. python examples/example_2_acoustic_morse_sender.py 192.168.1.99`
+  `python examples/example_2_acoustic_morse_sender.py 192.168.1.99`
 * **Visual Color Tracker & Acoustic Responder:**
-  `PYTHONPATH=. python examples/example_3_visual_receiver_tracker.py 192.168.1.99`
+  `python examples/example_3_visual_receiver_tracker.py 192.168.1.99`
 * **Interactive Keyboard Teleop (`W/A/S/D`, `I/J/K/L`, `B`, `1-6`):**
-  `PYTHONPATH=. python examples/example_4_keyboard_teleop.py 192.168.1.99`
+  `python examples/example_4_keyboard_teleop.py 192.168.1.99`
 
 ## 4. `RemoteRaspbot` API Reference
 Import with `from robot_client_socket import RemoteRaspbot` and initialize `bot = RemoteRaspbot(robot_ip)`:
